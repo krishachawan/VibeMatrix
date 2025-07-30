@@ -1235,23 +1235,49 @@
         const apiKey = "AIzaSyCrQ_gQLab7njcONvSU_AK1VJ4S4TgKftM";
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
+        // Get the selected icons from user answers first
+        const selectedIcons = [];
+        for (const [questionName, answerValue] of Object.entries(userAnswers)) {
+          const question = questions.find((q) => q.name === questionName);
+          if (question) {
+            const selectedOption = question.options.find(
+              (opt) => opt.value === answerValue
+            );
+            if (selectedOption) {
+              selectedIcons.push({
+                icon: selectedOption.icon,
+                tooltip: selectedOption.text,
+              });
+            }
+          }
+        }
+
         const prompt = `Create a design personality profile in JSON format with these keys:
-      {
-        "title": "Creative title based on ${userAnswers.tool} and ${userAnswers.focus}",
-        "description": "7-8 sentence description",
-        "funFact": "Interesting insight about how ${userAnswers.color} and ${userAnswers.principle} combine",
+    {
+        "title": "Creative title combining ${userAnswers.focus} and ${
+          userAnswers.tool
+        } aspects",
+        "description": "7-8 sentence description of this design personality",
+        "funFact": "Interesting insight about how ${userAnswers.color} and ${
+          userAnswers.principle
+        } combine in design",
         "quote": "Relevant design quote",
         "traits": ["trait1", "trait2", "trait3", "trait4", "trait5"],
         "avatarIcon": "relevant-lucide-icon-name"
-      }
-
-      Based on these answers:
-      - Name: ${designerName} (${realName})
-      - Colors: ${userAnswers.color}
-      - Principles: ${userAnswers.principle}
-      - Focus: ${userAnswers.focus}
-      - Tools: ${userAnswers.tool}
-      `;
+    }
+    
+    Important: Only respond with valid JSON that can be parsed directly.
+    Use these actual selected icons from the user's answers: ${JSON.stringify(
+      selectedIcons
+    )}.
+    
+    Based on these answers:
+    - Name: ${designerName} (${realName})
+    - Colors: ${userAnswers.color}
+    - Principles: ${userAnswers.principle}
+    - Focus: ${userAnswers.focus}
+    - Tools: ${userAnswers.tool}
+    `;
 
         try {
           console.log("Sending request to Gemini API...");
@@ -1274,16 +1300,30 @@
           const data = await response.json();
           console.log("Raw API response:", data);
 
-          const textResponse =
-            data.candidates?.[0]?.content?.parts?.[0]?.text ||
-            data.predictions?.[0]?.content ||
-            JSON.stringify(data);
+          // Extract the text response
+          let textResponse =
+            data.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-          const cleanResponse = textResponse.replace(/```json|```/g, "");
+          // Clean the response (remove markdown code blocks if present)
+          const cleanResponse = textResponse.replace(/```json|```/g, "").trim();
+
+          // Parse the JSON response
           const result = JSON.parse(cleanResponse);
 
+          // Ensure we have the minimum required fields
           if (!result.title || !result.description) {
             throw new Error("Incomplete response from API");
+          }
+
+          // Add the selected icons to the result
+          result.selectedIcons = selectedIcons;
+
+          // If avatarIcon wasn't provided, use a default
+          if (!result.avatarIcon) {
+            result.avatarIcon =
+              personalityTraits.avatar[userAnswers.focus] ||
+              personalityTraits.avatar[userAnswers.layout] ||
+              "user";
           }
 
           return result;
