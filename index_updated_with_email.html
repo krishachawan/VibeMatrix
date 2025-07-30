@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vibe Matrix</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"
+    ></script>
+    <script>
+      // Initialize EmailJS with your public key
+      (function () {
+        emailjs.init("UJ9eX3bBWN5HMWek9");
+      })();
+    </script>
+    <style>
+      :root {
+        --bg-primary: #000000;
+        --bg-secondary: #111111;
+        --bg-card: rgba(255, 255, 255, 0.05);
+        --text-primary: #ffffff;
+        --text-secondary: #cccccc;
+        --text-tertiary: #999999;
+        --accent-primary: #ffffff;
+        --accent-secondary: #8b5cf6;
+        --border-color: rgba(255, 255, 255, 0.1);
+        --border-radius: 16px;
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+        --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --glass-bg: rgba(255, 255, 255, 0.05);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        min-height: 100vh;
+        padding: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-image: radial-gradient(
+            circle at 10% 20%,
+            rgba(255, 255, 255, 0.02) 0%,
+            transparent 20%
+          ),
+          radial-gradient(
+            circle at 90% 80%,
+            rgba(255, 255, 255, 0.02) 0%,
+            transparent 20%
+          );
+      }
+
+      /* Typography */
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: -0.025em;
+        color: var(--text-primary);
+      }
+
+      h1 {
+        font-size: clamp(2.5rem, 6vw, 3.8rem);
+        margin-bottom: 1.5rem;
+      }
+
+      h2 {
+        font-size: clamp(2rem, 5vw, 2.5rem);
+        margin-bottom: 1.5rem;
+      }
+
+      p {
+        line-height: 1.6;
+        color: var(--text-secondary);
+        font-size: clamp(1rem, 1.5vw, 1.1rem);
+      }
+
+      .container {
+        max-width: 1200px;
+        width: 100%;
+        margin: 0 auto;
+      }
+
+      /* Stage container */
+      .stage {
+        width: 100%;
+        height: auto;
+        min-height: 90vh;
+        background: var(--bg-secondary);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--border-color);
+      }
+
+      /* Screens */
+      .screen {
+        padding: 3rem 1.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        min-height: 80vh;
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      /* Intro Screen */
+      #intro-screen {
+        display: flex;
+      }
+
+      #intro-screen h1 {
+        background: linear-gradient(
+          120deg,
+          var(--accent-primary),
+          var(--text-secondary)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .input-group {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        width: 100%;
+        max-width: 600px;
+        margin-bottom: 2.5rem;
+      }
+
+      @media (min-width: 768px) {
+        .input-group {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .input-field {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        padding: 1.25rem;
+        font-size: 1rem;
+        color: var(--text-primary);
+        font-family: "Inter", sans-serif;
+        transition: var(--transition);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .input-field::placeholder {
+        color: var(--text-tertiary);
+      }
+
+      .input-field:focus {
+        border-color: var(--accent-primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+      }
+
+      /* Quiz Screen */
+      .progress-bar-container {
+        width: 100%;
+        max-width: 800px;
+        margin: 1.5rem 0 2.5rem;
+      }
+
+      .progress-label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+      }
+
+      .progress-bar {
+        height: 10px;
+        background: var(--bg-card);
+        border-radius: 5px;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          var(--accent-primary),
+          var(--accent-secondary)
+        );
+        border-radius: 5px;
+        width: 0%;
+        transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      .question-label {
+        font-size: clamp(1.8rem, 4vw, 2.3rem);
+        font-weight: 700;
+        margin: clamp(1.5rem, 4vh, 2.5rem) 0;
+        line-height: 1.3;
+      }
+
+      .options {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        width: 100%;
+      }
+
+      @media (min-width: 640px) {
+        .options {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      .option input {
+        display: none;
+      }
+
+      .option span {
+        display: flex;
+        align-items: center;
+        padding: 1.5rem;
+        background: var(--bg-card);
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid var(--border-color);
+        text-align: left;
+        transition: var(--transition);
+        box-shadow: var(--shadow-sm);
+        height: 100%;
+      }
+
+      .option span .icon {
+        margin-right: 1.5rem;
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+        color: var(--accent-primary);
+      }
+
+      .option span:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--accent-primary);
+      }
+
+      .option input:checked + span {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--accent-primary);
+        box-shadow: var(--shadow-md);
+      }
+
+      /* Loading Screen */
+      #loading-screen .spinner {
+        width: 80px;
+        height: 80px;
+        border: 6px solid var(--bg-card);
+        border-top-color: var(--accent-primary);
+        border-left-color: var(--accent-secondary);
+        border-radius: 50%;
+        animation: spin 1.2s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Result Card */
+      #card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: var(--border-radius);
+        box-shadow: var(--glass-shadow);
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        border: 1px solid var(--glass-border);
+        position: relative;
+        overflow: hidden;
+      }
+
+      #card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-primary),
+          var(--accent-secondary)
+        );
+      }
+
+      #designerNameDisplay {
+        color: var(--accent-secondary);
+        font-size: clamp(1.2rem, 3vw, 1.6rem);
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+      }
+
+      #avatar {
+        font-size: clamp(5rem, 10vw, 6.5rem);
+        margin-bottom: 1.5rem;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-color);
+        margin: 0 auto;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      #avatar::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.2) 0%,
+          transparent 60%
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+      }
+
+      #avatar:hover::after {
+        opacity: 1;
+      }
+
+      #title {
+        font-size: clamp(2rem, 5vw, 2.5rem);
+        margin-bottom: 1.5rem;
+        background: linear-gradient(
+          120deg,
+          var(--accent-primary),
+          var(--accent-secondary)
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        position: relative;
+        display: inline-block;
+        padding: 0 20px;
+      }
+
+      #title::after {
+        content: "";
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--accent-secondary),
+          transparent
+        );
+        animation: pulse 3s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.5;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      #description {
+        margin-bottom: 1.5rem;
+        line-height: 1.7;
+        text-align: center;
+      }
+
+      #funFact {
+        background: var(--bg-card);
+        padding: 1.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+        text-align: left;
+        position: relative;
+      }
+
+      #funFact::before {
+        content: "“";
+        position: absolute;
+        top: -20px;
+        left: 10px;
+        font-size: 4rem;
+        color: var(--accent-secondary);
+        opacity: 0.3;
+        font-family: Georgia, serif;
+      }
+
+      #traits {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+      }
+
+      #traits i {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg-card);
+        border-radius: 50%;
+        color: var(--accent-secondary);
+        border: 1px solid var(--border-color);
+        transition: transform 0.3s ease;
+      }
+
+      #traits i:hover {
+        transform: translateY(-5px);
+      }
+
+      .card-actions {
+        display: grid;
+        gap: 1rem;
+        width: 100%;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+
+      /* Button Styles */
+      .glowing-btn,
+      .action-btn {
+        padding: 1rem 1.5rem;
+        border-radius: 0.75rem;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: var(--transition);
+        font-family: "Space Grotesk", sans-serif;
+        background: var(--bg-card);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+      }
+
+      .glowing-btn {
+        background: linear-gradient(
+          90deg,
+          var(--accent-primary),
+          var(--accent-secondary)
+        );
+        color: #000;
+        border: none;
+      }
+
+      .glowing-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(139, 92, 246, 0.3);
+      }
+
+      #download-btn {
+        background: linear-gradient(90deg, #8b5cf6, #6366f1);
+        color: white;
+        border: none;
+      }
+
+      #download-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(139, 92, 246, 0.3);
+      }
+
+      #restart-btn:hover {
+        border-color: var(--accent-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
+      }
+
+      /* Responsive Adjustments */
+      @media (max-width: 768px) {
+        .stage {
+          min-height: 100vh;
+        }
+
+        .screen {
+          padding: 2rem 1rem;
+        }
+
+        .input-group {
+          grid-template-columns: 1fr;
+        }
+
+        .card-actions {
+          grid-template-columns: 1fr;
+        }
+
+        #card {
+          padding: 1.5rem;
+        }
+      }
+
+      /* Animation Classes */
+      .fadeInUp {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.6s ease forwards;
+      }
+
+      @keyframes fadeInUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .delay-1 {
+        animation-delay: 0.1s;
+      }
+
+      .delay-2 {
+        animation-delay: 0.2s;
+      }
+
+      .delay-3 {
+        animation-delay: 0.3s;
+      }
+
+      .delay-4 {
+        animation-delay: 0.4s;
+      }
+
+      .pulse {
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .sound-wave {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        height: 20px;
+        margin-top: 15px;
+      }
+
+      .sound-wave span {
+        width: 3px;
+        background: var(--accent-secondary);
+        border-radius: 3px;
+        animation: wave 1.2s infinite ease-in-out;
+      }
+
+      .sound-wave span:nth-child(2) {
+        animation-delay: 0.2s;
+        height: 15px;
+      }
+      .sound-wave span:nth-child(3) {
+        animation-delay: 0.4s;
+        height: 20px;
+      }
+      .sound-wave span:nth-child(4) {
+        animation-delay: 0.6s;
+        height: 15px;
+      }
+      .sound-wave span:nth-child(5) {
+        animation-delay: 0.8s;
+        height: 10px;
+      }
+
+      @keyframes wave {
+        0%,
+        100% {
+          height: 10px;
+        }
+        50% {
+          height: 20px;
+        }
+      }
+      /* Add to your stylesheet */
+      #card {
+        transform: translateZ(0); /* Force GPU rendering */
+        contain: paint; /* Improve rendering performance */
+        backface-visibility: hidden; /* Fix for some rendering issues */
+      }
+
+      /* Fix for backdrop-filter in screenshots */
+      @media print {
+        #card {
+          backdrop-filter: none !important;
+          -webkit-backdrop-filter: none !important;
+          background: rgba(17, 17, 17, 0.95) !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="stage">
+        <!-- Intro Screen -->
+        <section id="intro-screen" class="screen">
+          <h1 class="fadeInUp">Design Vibe Matrix</h1>
+          <p class="fadeInUp delay-1">
+            Discover your unique design identity. Answer the matrix to reveal
+            your core design personality and strengths.
+          </p>
+          <br />
+          <div class="input-group fadeInUp delay-2">
+            <input
+              type="text"
+              id="realName"
+              class="input-field"
+              placeholder="Your Real Name"
+            />
+            <input
+              type="text"
+              id="designerName"
+              class="input-field"
+              placeholder="Your Designer Persona"
+            />
+            <input
+              type="email"
+              id="email-input"
+              class="input-field"
+              placeholder="Your Designer Mail"
+            />
+          </div>
+          <button class="glowing-btn fadeInUp delay-3" id="startBtn">
+            <span>Enter the Matrix</span>
+          </button>
+        </section>
+
+        <!-- Quiz Screen -->
+        <section id="quiz-screen" class="screen" style="display: none">
+          <div class="progress-bar-container fadeInUp">
+            <div class="progress-label">
+              <span>Design Identity Discovery</span>
+              <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+          </div>
+          <div id="quiz-content"></div>
+        </section>
+
+        <!-- Loading Screen -->
+        <section id="loading-screen" class="screen" style="display: none">
+          <div class="spinner fadeInUp"></div>
+          <p class="fadeInUp delay-1">Analyzing Design Patterns...</p>
+          <div class="sound-wave fadeInUp delay-2">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </section>
+
+        <!-- Result Card -->
+        <section id="card" class="screen" style="display: none">
+          <h3 id="designerNameDisplay" class="fadeInUp"></h3>
+          <div id="avatar" class="fadeInUp delay-1"></div>
+          <h2 id="title" class="fadeInUp delay-2"></h2>
+          <p id="description" class="fadeInUp delay-3"></p>
+          <div id="funFact" class="fadeInUp delay-4"></div>
+          <div id="traits" class="fadeInUp delay-4"></div>
+          <div class="card-actions fadeInUp delay-4">
+            <button id="restart-btn" class="action-btn">
+              <span><i data-lucide="rotate-cw"></i> Restart</span>
+            </button>
+            <button id="email-btn" class="action-btn">
+              <span><i data-lucide="mail"></i> Email Card</span>
+            </button>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      emailjs.init("UJ9eX3bBWN5HMWek9"); // Initialize EmailJS
+      // Questions
+      const questions = [
+        {
+          name: "color",
+          label: "Your signature color approach is...",
+          options: [
+            {
+              value: "blue",
+              text: "Modern Blues & Trustworthy Hues",
+              icon: "droplets",
+            },
+            {
+              value: "vibrant",
+              text: "Vibrant & Emotionally Charged",
+              icon: "aperture",
+            },
+            { value: "dark", text: "Monochrome & Sophisticated", icon: "moon" },
+            {
+              value: "pastel",
+              text: "Soft Pastels & Approachable",
+              icon: "flower",
+            },
+          ],
+        },
+        {
+          name: "principle",
+          label: "You design layouts that are...",
+          options: [
+            {
+              value: "symmetry",
+              text: "Symmetrical & Balanced",
+              icon: "landmark",
+            },
+            {
+              value: "asymmetry",
+              text: "Dynamic & Asymmetrical",
+              icon: "wind",
+            },
+            {
+              value: "minimalism",
+              text: "Minimal & Essential",
+              icon: "feather",
+            },
+            {
+              value: "maximalism",
+              text: "Expressive & Rich",
+              icon: "layers-3",
+            },
+          ],
+        },
+        {
+          name: "focus",
+          label: "Your primary design focus is on...",
+          options: [
+            { value: "feel", text: "Emotional Resonance", icon: "sparkles" },
+            {
+              value: "typography",
+              text: "Typography & Hierarchy",
+              icon: "pilcrow",
+            },
+            { value: "animation", text: "Motion & Interaction", icon: "film" },
+            {
+              value: "usability",
+              text: "Function & Accessibility",
+              icon: "sliders-horizontal",
+            },
+          ],
+        },
+        {
+          name: "workflow",
+          label: "Your creative process is...",
+          options: [
+            { value: "solo", text: "Focused & Independent", icon: "user" },
+            {
+              value: "collaborative",
+              text: "Collaborative & Team-Based",
+              icon: "users",
+            },
+            { value: "iterative", text: "Agile & Iterative", icon: "repeat" },
+            { value: "structured", text: "Planned & Systematic", icon: "map" },
+          ],
+        },
+        {
+          name: "tool",
+          label: "Your primary design tool is...",
+          options: [
+            { value: "figma", text: "Figma for Collaboration", icon: "figma" },
+            { value: "adobe", text: "Adobe Creative Suite", icon: "brush" },
+            { value: "sketch", text: "Sketch for UI Design", icon: "pen-tool" },
+            { value: "code", text: "Code for Prototyping", icon: "code" },
+          ],
+        },
+        {
+          name: "layout",
+          label: "Which layout best matches your thinking style?",
+          options: [
+            { value: "grid", text: "Grid & Structure", icon: "layout-grid" },
+            {
+              value: "freeform",
+              text: "Freeform & Organic",
+              icon: "line-squiggle",
+            },
+            {
+              value: "modular",
+              text: "Modular & Component-Based",
+              icon: "puzzle",
+            },
+            {
+              value: "timeline",
+              text: "Timeline & Sequential",
+              icon: "line-chart",
+            },
+          ],
+        },
+        {
+          name: "inspiration",
+          label: "What inspires you most?",
+          options: [
+            { value: "nature", text: "Nature & Organic Forms", icon: "leaf" },
+            {
+              value: "architecture",
+              text: "Architecture & Structures",
+              icon: "building-2",
+            },
+            { value: "music", text: "Music & Rhythm", icon: "music" },
+            {
+              value: "psychology",
+              text: "Psychology & Behavior",
+              icon: "brain",
+            },
+          ],
+        },
+        {
+          name: "accessibility",
+          label: "Which accessibility principle do you prioritize?",
+          options: [
+            {
+              value: "contrast",
+              text: "Contrast & Readability",
+              icon: "contrast",
+            },
+            {
+              value: "keyboard",
+              text: "Keyboard Navigation",
+              icon: "keyboard",
+            },
+            { value: "alttext", text: "Alt-Text & Semantics", icon: "text" },
+            {
+              value: "scalable",
+              text: "Scalable UI & Responsiveness",
+              icon: "smartphone",
+            },
+          ],
+        },
+        {
+          name: "pattern",
+          label: "Which UI pattern do you naturally use?",
+          options: [
+            { value: "cards", text: "Cards & Modular Layouts", icon: "square" },
+            {
+              value: "tabs",
+              text: "Tabs & Organized Content",
+              icon: "panel-top",
+            },
+            {
+              value: "infinite",
+              text: "Infinite Scroll & Discovery",
+              icon: "scroll",
+            },
+            {
+              value: "accordions",
+              text: "Accordions & Progressive Disclosure",
+              icon: "chevron-down",
+            },
+          ],
+        },
+      ];
+
+      // Personality traits with enhancements
+      const personalityTraits = {
+        title: {
+          blue: "System",
+          vibrant: "Chromatic",
+          dark: "Shadow",
+          pastel: "Dream",
+          symmetry: "Architect",
+          asymmetry: "Maverick",
+          minimalism: "Purist",
+          maximalism: "Visionary",
+          feel: "Empathic",
+          typography: "Wordsmith",
+          animation: "Animator",
+          usability: "Engineer",
+          solo: "Sentinel",
+          collaborative: "Nexus",
+          iterative: "Alchemist",
+          structured: "Strategist",
+          figma: "of Figma",
+          adobe: "of Adobe",
+          sketch: "of Sketch",
+          code: "of the DOM",
+          grid: "Structured",
+          freeform: "Organic",
+          modular: "Modular",
+          timeline: "Sequential",
+          nature: "Natural",
+          architecture: "Architectural",
+          music: "Rhythmic",
+          psychology: "Cognitive",
+          contrast: "Contrast",
+          keyboard: "Navigable",
+          alttext: "Semantic",
+          scalable: "Responsive",
+          cards: "Card-Based",
+          tabs: "Tabbed",
+          infinite: "Infinite",
+          accordions: "Accordion",
+        },
+        description: {
+          blue: "You appreciate clean, structured systems and user interfaces that feel both modern and trustworthy. ",
+          vibrant:
+            "You believe design should be an explosion of energy and emotion, using bold color to make a statement. ",
+          dark: "You find elegance in the shadows, crafting sleek, focused experiences that are easy on the eyes. ",
+          pastel:
+            "You create gentle, approachable designs that feel like a breath of fresh air, prioritizing friendliness. ",
+          symmetry:
+            "For you, balance, order, and harmony are paramount. Your work is stable and intuitively understood. ",
+          asymmetry:
+            "You love to break the grid, creating dynamic, visually exciting layouts that guide the eye with intention. ",
+          minimalism:
+            "You live by 'less is more,' stripping away all but the essential to achieve absolute clarity. ",
+          maximalism:
+            "You are an expressive creator, weaving rich tapestries of texture, color, and information. ",
+          feel: "You design with your heart, focusing on the intangible feeling and emotional resonance of an interface. ",
+          typography:
+            "You know that content is king and believe typography is the throne it sits on, focusing on legibility and style. ",
+          animation:
+            "You see design as a film, using motion to tell stories, delight users, and provide critical feedback. ",
+          usability:
+            "You are a problem-solver at heart, ensuring every element serves a purpose and the path is always clear. ",
+          solo: "You do your best work in deep focus, channeling your singular vision into a cohesive, powerful result. ",
+          collaborative:
+            "You thrive on collective energy, believing the best ideas are born from discussion, debate, and shared passion. ",
+          iterative:
+            "You work like a sculptor, rapidly prototyping and refining until the perfect form emerges from the digital clay. ",
+          structured:
+            "You are a master planner, building a strong foundation of research and strategy before placing a single pixel. ",
+          grid: "Your thinking is organized and structured, creating layouts that are predictable and easy to navigate. ",
+          freeform:
+            "Your approach is organic and fluid, allowing content to flow naturally without rigid constraints. ",
+          modular:
+            "You think in components, building systems that are flexible and reusable across projects. ",
+          timeline:
+            "You design with time in mind, creating experiences that unfold in logical, sequential steps. ",
+          nature:
+            "You find inspiration in organic forms and natural patterns, bringing life and authenticity to digital spaces. ",
+          architecture:
+            "You value structure and form, creating experiences with strong foundations and intentional spaces. ",
+          music:
+            "You design with rhythm and harmony, creating interfaces that feel like a well-composed symphony. ",
+          psychology:
+            "You focus on human behavior and cognition, designing experiences that align with how people think and act. ",
+          contrast:
+            "You prioritize visual clarity and legibility, ensuring content is accessible to all users regardless of ability. ",
+          keyboard:
+            "You design for efficient navigation, making interfaces usable without a mouse. ",
+          alttext:
+            "You ensure content is meaningful to all users, including those using assistive technologies. ",
+          scalable:
+            "You build flexible interfaces that adapt gracefully to any device or screen size. ",
+          cards:
+            "You organize information in bite-sized chunks, making complex content digestible and scannable. ",
+          tabs: "You create organized content structures that allow users to focus on one task at a time. ",
+          infinite:
+            "You design for discovery, encouraging exploration through continuous content loading. ",
+          accordions:
+            "You value progressive disclosure, revealing information only when users need it. ",
+        },
+        avatar: {
+          feel: "sparkles",
+          typography: "pilcrow",
+          animation: "film",
+          usability: "sliders-horizontal",
+          symmetry: "landmark",
+          asymmetry: "wind",
+          minimalism: "feather",
+          maximalism: "layers-3",
+          grid: "layout-grid",
+          freeform: "bezier-curve",
+          modular: "puzzle",
+          timeline: "timeline",
+          nature: "leaf",
+          architecture: "building-2",
+          music: "music",
+          psychology: "brain",
+          contrast: "contrast",
+          keyboard: "keyboard",
+          alttext: "text",
+          scalable: "smartphone",
+          cards: "square",
+          tabs: "panel-top",
+          infinite: "scroll",
+          accordions: "chevron-down",
+        },
+        quotes: [
+          "Design is not just what it looks like and feels like. Design is how it works.",
+          "Good design is obvious. Great design is transparent.",
+          "Design creates culture. Culture shapes values. Values determine the future.",
+          "The details are not the details. They make the design.",
+          "Design is intelligence made visible.",
+          "Simplicity is the ultimate sophistication.",
+          "Design is where science and art break even.",
+          "Design is a solution to a problem. Art is a question to a problem.",
+          "Design can be art. Design can be aesthetics. Design is so simple, that's why it is so complicated.",
+          "Design is thinking made visual.",
+        ],
+      };
+
+      // DOM references
+      const dom = {
+        screens: {
+          intro: document.getElementById("intro-screen"),
+          quiz: document.getElementById("quiz-screen"),
+          loading: document.getElementById("loading-screen"),
+          card: document.getElementById("card"),
+        },
+        startBtn: document.getElementById("startBtn"),
+        realNameInput: document.getElementById("realName"),
+        designerNameInput: document.getElementById("designerName"),
+        quizContent: document.getElementById("quiz-content"),
+        progressFill: document.getElementById("progressFill"),
+        progressPercent: document.getElementById("progressPercent"),
+        designerNameDisplay: document.getElementById("designerNameDisplay"),
+        titleEl: document.getElementById("title"),
+        descEl: document.getElementById("description"),
+        funFactEl: document.getElementById("funFact"),
+        avatarEl: document.getElementById("avatar"),
+        traitsEl: document.getElementById("traits"),
+        emailBtn: document.getElementById("email-btn"), // New email button
+        emailInput: document.getElementById("email-input"), // New email input
+        restartBtn: document.getElementById("restart-btn"),
+      };
+
+      let currentStep = 0;
+      const userAnswers = {};
+      let designerName = "";
+      let realName = "";
+      let personalityResult = null; // To store the generated personality result
+
+      // Initialize icons
+      lucide.createIcons();
+
+      // Save state to localStorage (unchanged)
+      function saveState() {
+        const state = {
+          currentStep,
+          userAnswers,
+          designerName,
+          realName,
+        };
+        localStorage.setItem("designQuizState", JSON.stringify(state));
+      }
+
+      // Load state from localStorage (unchanged)
+      function loadState() {
+        const savedState = localStorage.getItem("designQuizState");
+        if (savedState) {
+          const state = JSON.parse(savedState);
+          currentStep = state.currentStep;
+          Object.assign(userAnswers, state.userAnswers);
+          designerName = state.designerName;
+          realName = state.realName;
+
+          if (realName) dom.realNameInput.value = realName;
+          if (designerName) dom.designerNameInput.value = designerName;
+
+          if (currentStep > 0) {
+            showScreen("quiz");
+            renderQuestion();
+          }
+        }
+      }
+
+      // Play sound effect (unchanged)
+      function playSound(type) {
+        try {
+          const audioContext = new (window.AudioContext ||
+            window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+
+          oscillator.type = "sine";
+          oscillator.frequency.setValueAtTime(
+            type === "select" ? 440 : 523.25,
+            audioContext.currentTime
+          );
+          gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(
+            0.0001,
+            audioContext.currentTime + 0.3
+          );
+
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+
+          oscillator.start();
+          oscillator.stop(audioContext.currentTime + 0.3);
+        } catch (e) {
+          console.log("Audio not supported", e);
+        }
+      }
+
+      // Trigger haptic feedback if available (unchanged)
+      function hapticFeedback() {
+        if (navigator.vibrate) {
+          navigator.vibrate(10);
+        }
+      }
+
+      // Show a specific screen (unchanged)
+      function showScreen(screen) {
+        for (const key in dom.screens) {
+          dom.screens[key].style.display = "none";
+        }
+
+        dom.screens[screen].style.display = "flex";
+
+        const elements = dom.screens[screen].querySelectorAll(".fadeInUp");
+        elements.forEach((el, index) => {
+          el.style.animationDelay = `${index * 0.1}s`;
+        });
+
+        if (screen !== "intro") {
+          playSound("transition");
+        }
+      }
+
+      // Render current question (unchanged)
+      function renderQuestion() {
+        if (currentStep >= questions.length) {
+          calculateAndShowResult();
+          return;
+        }
+
+        const q = questions[currentStep];
+        const percent = Math.round((currentStep / questions.length) * 100);
+        dom.progressPercent.textContent = `${percent}%`;
+
+        dom.quizContent.innerHTML = `
+            <div class="question-label fadeInUp">${q.label}</div>
+            <div class="options">
+                ${q.options
+                  .map(
+                    (opt) => `
+                    <label class="option fadeInUp">
+                        <input type="radio" name="${q.name}" value="${
+                      opt.value
+                    }" ${userAnswers[q.name] === opt.value ? "checked" : ""}>
+                        <span>
+                            <i class="icon" data-lucide="${opt.icon}"></i>
+                            ${opt.text}
+                        </span>
+                    </label>
+                `
+                  )
+                  .join("")}
+            </div>
+        `;
+
+        lucide.createIcons();
+
+        dom.quizContent.querySelectorAll("input").forEach((radio) => {
+          radio.addEventListener("change", (e) => {
+            userAnswers[q.name] = e.target.value;
+            hapticFeedback();
+            playSound("select");
+
+            setTimeout(() => {
+              currentStep++;
+              saveState();
+              renderQuestion();
+            }, 350);
+          });
+        });
+
+        gsap.to(dom.progressFill, {
+          width: `${(currentStep / questions.length) * 100}%`,
+          duration: 0.6,
+          ease: "power2.out",
+        });
+      }
+      // Render current question
+      async function generateWithGemini(userAnswers, designerName, realName) {
+        const apiKey = "YOUR_KEY"; // Replace with actual key
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+        const prompt = `Create a design personality profile in JSON format with these keys:
+      {
+        "title": "Creative title based on ${userAnswers.tool} and ${userAnswers.focus}",
+        "description": "7-8 sentence description",
+        "funFact": "Interesting insight about how ${userAnswers.color} and ${userAnswers.principle} combine",
+        "quote": "Relevant design quote",
+        "traits": ["trait1", "trait2", "trait3", "trait4", "trait5"],
+        "avatarIcon": "relevant-lucide-icon-name"
+      }
+
+      Based on these answers:
+      - Name: ${designerName} (${realName})
+      - Colors: ${userAnswers.color}
+      - Principles: ${userAnswers.principle}
+      - Focus: ${userAnswers.focus}
+      - Tools: ${userAnswers.tool}
+      `;
+
+        try {
+          console.log("Sending request to Gemini API...");
+          const response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [
+                {
+                  parts: [{ text: prompt }],
+                },
+              ],
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          console.log("Raw API response:", data);
+
+          const textResponse =
+            data.candidates?.[0]?.content?.parts?.[0]?.text ||
+            data.predictions?.[0]?.content ||
+            JSON.stringify(data);
+
+          const cleanResponse = textResponse.replace(/```json|```/g, "");
+          const result = JSON.parse(cleanResponse);
+
+          if (!result.title || !result.description) {
+            throw new Error("Incomplete response from API");
+          }
+
+          return result;
+        } catch (error) {
+          console.error("Gemini API Error:", error);
+          return null;
+        }
+      }
+
+      // Generate personality profile with enhanced logic
+      // Modified generatePersonality function to preserve selected icons
+      function generatePersonality() {
+        // Get random quote
+        const quote =
+          personalityTraits.quotes[
+            Math.floor(Math.random() * personalityTraits.quotes.length)
+          ];
+
+        // Create title from core traits
+        const title = `The ${personalityTraits.title[userAnswers.focus]} ${
+          personalityTraits.title[userAnswers.principle]
+        } ${personalityTraits.title[userAnswers.tool]}`;
+
+        // Build description from all answers
+        let description = "";
+        for (const key in userAnswers) {
+          if (personalityTraits.description[userAnswers[key]]) {
+            description += personalityTraits.description[userAnswers[key]];
+          }
+        }
+
+        // Create fun fact based on combination
+        let fact = "";
+        if (
+          userAnswers.focus === "feel" &&
+          userAnswers.inspiration === "nature"
+        ) {
+          fact =
+            "Your empathetic approach combined with inspiration from nature creates truly organic user experiences.";
+        } else if (
+          userAnswers.layout === "grid" &&
+          userAnswers.principle === "symmetry"
+        ) {
+          fact =
+            "Your structured thinking and symmetrical approach results in interfaces that are intuitive and predictable.";
+        } else if (
+          userAnswers.accessibility === "contrast" &&
+          userAnswers.pattern === "cards"
+        ) {
+          fact =
+            "Your focus on contrast combined with card-based design ensures information is both accessible and digestible.";
+        } else {
+          fact = `Your ${personalityTraits.title[
+            userAnswers.workflow
+          ].toLowerCase()} workflow combined with your ${personalityTraits.title[
+            userAnswers.pattern
+          ].toLowerCase()} approach creates uniquely effective design solutions.`;
+        }
+
+        fact = `${fact}<br><br><i>"${quote}"</i>`;
+
+        // Get avatar from focus or layout
+        const avatar =
+          personalityTraits.avatar[userAnswers.focus] ||
+          personalityTraits.avatar[userAnswers.layout] ||
+          "gem";
+
+        // Get ACTUAL selected icons from user answers
+        const selectedIcons = [];
+        for (const [questionName, answerValue] of Object.entries(userAnswers)) {
+          const question = questions.find((q) => q.name === questionName);
+          if (question) {
+            const selectedOption = question.options.find(
+              (opt) => opt.value === answerValue
+            );
+            if (selectedOption) {
+              selectedIcons.push({
+                icon: selectedOption.icon,
+                tooltip: selectedOption.text,
+              });
+            }
+          }
+        }
+
+        return {
+          title,
+          description,
+          fact,
+          avatar,
+          selectedIcons, // Now contains actual selected icons
+          quote,
+        };
+      }
+
+      // Updated calculateAndShowResult to use selected icons
+      async function calculateAndShowResult() {
+        dom.progressPercent.textContent = "100%";
+        showScreen("loading");
+
+        try {
+          personalityResult = await generateWithGemini(
+            userAnswers,
+            designerName,
+            realName
+          );
+          console.log("API Response:", personalityResult);
+
+          if (!personalityResult) {
+            console.warn("Using fallback data");
+            personalityResult = generatePersonality();
+          }
+
+          // Update UI
+          dom.designerNameDisplay.textContent = `${realName} as ${designerName}`;
+          dom.titleEl.textContent =
+            personalityResult.title || "Design Personality";
+          dom.descEl.textContent =
+            personalityResult.description || "No description generated";
+
+          dom.funFactEl.innerHTML = personalityResult.funFact
+            ? `<b>Design Insight:</b> ${personalityResult.funFact}<br><br><i>"${personalityResult.quote}"</i>`
+            : `<b>Design Insight:</b> No insights generated`;
+
+          const avatarIcon =
+            personalityResult.avatarIcon || personalityResult.avatar || "user";
+          dom.avatarEl.innerHTML = `<i data-lucide="${avatarIcon}"></i>`;
+
+          const iconsToShow = personalityResult.selectedIcons ||
+            personalityResult.traits?.map((trait) => ({
+              icon: getIconForTrait(trait),
+              tooltip: trait,
+            })) || [{ icon: "star", tooltip: "Designer" }];
+
+          dom.traitsEl.innerHTML = iconsToShow
+            .slice(0, 5)
+            .map(
+              (item) =>
+                `<i data-lucide="${item.icon}" title="${item.tooltip}"></i>`
+            )
+            .join("");
+
+          lucide.createIcons();
+          showScreen("card");
+          confetti({ particleCount: 150, spread: 70 });
+
+          await sendEmail(); // Automatically email the results
+        } catch (error) {
+          console.error("Fatal error in result calculation:", error);
+          dom.quizContent.innerHTML = `
+          <h2>Error Generating Results</h2>
+          <p>We couldn't generate your design profile. Please try again.</p>
+          <button onclick="window.location.reload()">Restart Quiz</button>
+        `;
+        }
+      }
+
+      // Helper function to map traits to icons (unchanged)
+      function getIconForTrait(trait) {
+        const lowerTrait = trait.toLowerCase();
+        if (lowerTrait.includes("visual")) return "palette";
+        if (lowerTrait.includes("user")) return "users";
+        if (lowerTrait.includes("creative")) return "sparkles";
+        if (lowerTrait.includes("technical")) return "code";
+        if (lowerTrait.includes("strategic")) return "chess";
+        if (lowerTrait.includes("detail")) return "zoom-in";
+        if (lowerTrait.includes("innovative")) return "lightbulb";
+        if (lowerTrait.includes("collaborative")) return "users";
+        return "star";
+      }
+
+      // Send email function
+      async function sendEmail() {
+        const email = dom.emailInput.value.trim();
+        if (!email) {
+          dom.emailInput.animate(
+            [
+              { transform: "translateX(0)" },
+              { transform: "translateX(10px)" },
+              { transform: "translateX(-10px)" },
+              { transform: "translateX(0)" },
+            ],
+            {
+              duration: 300,
+              iterations: 2,
+            }
+          );
+          return;
+        }
+
+        const btn = dom.emailBtn;
+        const originalHTML = btn.innerHTML;
+
+        btn.innerHTML =
+          '<span><i data-lucide="loader-2" class="animate-spin"></i> Sending...</span>';
+        btn.disabled = true;
+        lucide.createIcons();
+
+        try {
+          // Prepare the email template parameters (no image now)
+          const templateParams = {
+            to_email: dom.emailInput.value.trim(),
+            real_name: realName,
+            designer_name: designerName,
+            profile_title:
+              personalityResult.title || "Design Personality Profile",
+            profile_description:
+              personalityResult.description || "No description available",
+            profile_insight:
+              personalityResult.funFact || "No insights available",
+            profile_quote: personalityResult.quote || "No quote available",
+          };
+          console.log("Sending to EmailJS:", templateParams);
+          // Send the email using EmailJS
+          const response = await emailjs.send(
+            "service_6onzl0n", // Your EmailJS service ID
+            "template_zk0p1os", // Your EmailJS template ID
+            templateParams
+          );
+
+          console.log("Email sent successfully:", response);
+          btn.innerHTML = '<span><i data-lucide="check"></i> Sent!</span>';
+
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+          });
+        } catch (error) {
+          console.error("Failed to send email:", error);
+          btn.innerHTML =
+            '<span><i data-lucide="alert-triangle"></i> Failed</span>';
+
+          btn.animate(
+            [
+              { backgroundColor: "rgba(255, 255, 255, 0.05)" },
+              { backgroundColor: "rgba(239, 68, 68, 0.2)" },
+              { backgroundColor: "rgba(255, 255, 255, 0.05)" },
+            ],
+            {
+              duration: 1000,
+              iterations: 1,
+            }
+          );
+        } finally {
+          setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+            lucide.createIcons();
+          }, 2000);
+        }
+      }
+
+      // Event listeners (updated)
+      dom.startBtn.addEventListener("click", () => {
+        realName = dom.realNameInput.value.trim();
+        designerName = dom.designerNameInput.value.trim();
+
+        if (!realName || !designerName || !dom.emailInput.value.trim()) {
+          if (!realName) shake(dom.realNameInput);
+          if (!designerName) shake(dom.designerNameInput);
+          if (!dom.emailInput.value.trim()) shake(dom.emailInput);
+          dom.realNameInput.animate(
+            [
+              { transform: "translateX(0)" },
+              { transform: "translateX(10px)" },
+              { transform: "translateX(-10px)" },
+              { transform: "translateX(0)" },
+            ],
+            {
+              duration: 300,
+              iterations: 2,
+            }
+          );
+
+          dom.designerNameInput.animate(
+            [
+              { transform: "translateX(0)" },
+              { transform: "translateX(10px)" },
+              { transform: "translateX(-10px)" },
+              { transform: "translateX(0)" },
+            ],
+            {
+              duration: 300,
+              iterations: 2,
+            }
+          );
+
+          return;
+        }
+
+        saveState();
+        showScreen("quiz");
+        renderQuestion();
+      });
+
+      function shake(element) {
+        element.animate(
+          [
+            { transform: "translateX(0)" },
+            { transform: "translateX(10px)" },
+            { transform: "translateX(-10px)" },
+            { transform: "translateX(0)" },
+          ],
+          { duration: 300, iterations: 2 }
+        );
+      }
+
+      // Add email button event listener
+      dom.emailBtn.addEventListener("click", sendEmail);
+
+      dom.restartBtn.addEventListener("click", () => {
+        localStorage.removeItem("designQuizState");
+        window.location.reload();
+      });
+      // Initialize
+      showScreen("intro");
+      loadState();
+    </script>
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
+      // TODO: Add SDKs for Firebase products that you want to use
+      // https://firebase.google.com/docs/web/setup#available-libraries
+
+      // Your web app's Firebase configuration
+      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+      const firebaseConfig = {
+        apiKey: "AIzaSyANtnYztqy1UieseFKNX-ksk4Jhp3-ylN8",
+        authDomain: "vibe-matrix.firebaseapp.com",
+        projectId: "vibe-matrix",
+        storageBucket: "vibe-matrix.firebasestorage.app",
+        messagingSenderId: "311726403213",
+        appId: "1:311726403213:web:f2ea02abeff6958ca5fcc4",
+        measurementId: "G-MNMQL1YTZ8",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+    </script>
+  </body>
+</html>
